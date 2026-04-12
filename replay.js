@@ -638,11 +638,35 @@ function bindUiEvents() {
             return;
         }
         const container = document.querySelector(".player-shell");
+        const mediaTarget = elements.replayPlayer?.querySelector?.("video") || elements.replayPlayer;
+
         if (!document.fullscreenElement) {
-            await container.requestFullscreen?.();
+            if (container.requestFullscreen) {
+                await container.requestFullscreen();
+                return;
+            }
+
+            if (container.webkitRequestFullscreen) {
+                await container.webkitRequestFullscreen();
+                return;
+            }
+
+            if (mediaTarget?.webkitEnterFullscreen) {
+                mediaTarget.webkitEnterFullscreen();
+                return;
+            }
+
             return;
         }
-        await document.exitFullscreen?.();
+
+        if (document.exitFullscreen) {
+            await document.exitFullscreen();
+            return;
+        }
+
+        if (document.webkitExitFullscreen) {
+            await document.webkitExitFullscreen();
+        }
     });
 
     elements.progressBar.addEventListener("input", () => {
