@@ -235,6 +235,11 @@ function isEditableTarget(target) {
 function setupPageProtection() {
     const blockedKeys = new Set(["F12", "F3"]);
     const blockedCombos = new Set(["A", "C", "I", "J", "K", "P", "S", "U"]);
+    const userAgent = navigator.userAgent || "";
+    const platform = navigator.platform || "";
+    const maxTouchPoints = Number(navigator.maxTouchPoints || 0);
+    const isIOSFamily = /iPad|iPhone|iPod/i.test(userAgent) || (platform === "MacIntel" && maxTouchPoints > 1);
+    const isMobileBrowser = isIOSFamily || /Android|Mobile/i.test(userAgent) || maxTouchPoints > 1;
 
     const blockInteraction = (event, shouldLock = false, title = "Akses dibatasi", message = "Interaksi ini tidak diizinkan pada halaman replay.") => {
         if (isEditableTarget(event.target) && !["P", "S", "U"].includes(String(event.key || "").toUpperCase())) {
@@ -294,28 +299,30 @@ function setupPageProtection() {
         }
     });
 
-    let devtoolsTriggered = false;
-    const detectDevtools = () => {
-        if (devtoolsTriggered || state.guardLocked) {
-            return;
-        }
+    if (!isMobileBrowser) {
+        let devtoolsTriggered = false;
+        const detectDevtools = () => {
+            if (devtoolsTriggered || state.guardLocked) {
+                return;
+            }
 
-        const widthGap = window.outerWidth - window.innerWidth;
-        const heightGap = window.outerHeight - window.innerHeight;
-        const debuggerStart = performance.now();
-        debugger;
-        const debuggerDelay = performance.now() - debuggerStart;
+            const widthGap = window.outerWidth - window.innerWidth;
+            const heightGap = window.outerHeight - window.innerHeight;
+            const debuggerStart = performance.now();
+            debugger;
+            const debuggerDelay = performance.now() - debuggerStart;
 
-        if (widthGap > 160 || heightGap > 160 || debuggerDelay > 150) {
-            devtoolsTriggered = true;
-            lockPage(
-                "Developer tools terdeteksi",
-                "Pemutaran dihentikan karena developer tools atau panel inspeksi terdeteksi terbuka."
-            );
-        }
-    };
+            if (widthGap > 160 || heightGap > 160 || debuggerDelay > 150) {
+                devtoolsTriggered = true;
+                lockPage(
+                    "Developer tools terdeteksi",
+                    "Pemutaran dihentikan karena developer tools atau panel inspeksi terdeteksi terbuka."
+                );
+            }
+        };
 
-    window.setInterval(detectDevtools, 1000);
+        window.setInterval(detectDevtools, 1000);
+    }
 }
 
 function parseReplayDate(dateString) {
