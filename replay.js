@@ -550,7 +550,8 @@ function toggleMute() {
 async function loadReplays() {
     const response = await fetch("./replays.json", { cache: "no-store" });
     const data = await response.json();
-    const scopedReplayId = slugify(state.accessPayload?.replayId || "");
+    const rawScopedReplayId = String(state.accessPayload?.replayId || "").trim();
+    const scopedReplayId = rawScopedReplayId ? slugify(rawScopedReplayId) : "";
 
     state.allReplays = Array.isArray(data)
         ? data.filter((item) => item && item.link).map((item, index) => ({
