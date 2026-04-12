@@ -259,6 +259,24 @@ textarea {
 }
 
 @media (max-width: 768px) {
+    .replay-layout {
+        gap: 16px;
+    }
+
+    .replay-sidebar {
+        max-height: none;
+        overflow: visible;
+    }
+
+    .replay-list {
+        max-height: min(55vh, 420px);
+    }
+
+    .custom-logo {
+        max-width: 112px;
+        height: auto;
+    }
+
     .overlay-play {
         width: 66px;
         height: 66px;

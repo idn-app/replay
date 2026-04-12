@@ -7,6 +7,7 @@ const state = {
     accessToken: "",
     accessVerified: false,
     accessPayload: null,
+    accessReplays: [],
 };
 
 const elements = {
@@ -222,6 +223,7 @@ async function verifyReplayAccess() {
 
     state.accessVerified = true;
     state.accessPayload = result.payload || state.accessPayload;
+    state.accessReplays = Array.isArray(result.replays) ? result.replays : [];
     return true;
 }
 
@@ -548,26 +550,20 @@ function toggleMute() {
 }
 
 async function loadReplays() {
-    const response = await fetch("./replays.json", { cache: "no-store" });
-    const data = await response.json();
-    const rawScopedReplayId = String(state.accessPayload?.replayId || "").trim();
-    const scopedReplayId = rawScopedReplayId ? slugify(rawScopedReplayId) : "";
-
-    state.allReplays = Array.isArray(data)
-        ? data.filter((item) => item && item.link).map((item, index) => ({
-            ...item,
-            id: buildReplayId(item, index),
-        })).sort((a, b) => parseReplayDate(b.tanggal) - parseReplayDate(a.tanggal))
+    state.allReplays = Array.isArray(state.accessReplays)
+        ? state.accessReplays
+            .filter((item) => item && item.link)
+            .map((item, index) => ({
+                ...item,
+                id: buildReplayId(item, index),
+            }))
+            .sort((a, b) => parseReplayDate(b.tanggal) - parseReplayDate(a.tanggal))
         : [];
-
-    if (scopedReplayId) {
-        state.allReplays = state.allReplays.filter((item) => item.id === scopedReplayId);
-    }
 
     if (!state.allReplays.length) {
         state.filteredReplays = [];
         renderList();
-        elements.playerStatus.textContent = scopedReplayId ? "Replay tidak tersedia" : "Belum ada replay";
+        elements.playerStatus.textContent = "Belum ada replay";
         return;
     }
 
@@ -668,7 +664,7 @@ init().catch(() => {
     elements.playerStatus.textContent = "Gagal memuat replay";
     elements.replayList.innerHTML = `
         <div class="empty-state rounded-2xl p-5 text-center text-gray-400">
-            File JSON replay gagal dimuat.
+            Data replay gagal dimuat dari server.
         </div>
     `;
 });
