@@ -14,6 +14,7 @@ const elements = {
     replayPlayer: document.getElementById("replayPlayer"),
     replayList: document.getElementById("replayList"),
     searchInput: document.getElementById("searchInput"),
+    searchBarWrap: document.getElementById("searchBarWrap"),
     replayTitle: document.getElementById("replayTitle"),
     replayDate: document.getElementById("replayDate"),
     playerStatus: document.getElementById("playerStatus"),
@@ -467,6 +468,19 @@ function renderList() {
     });
 }
 
+function updateSearchVisibility() {
+    if (!elements.searchBarWrap || !elements.searchInput) {
+        return;
+    }
+
+    const shouldHide = state.allReplays.length <= 1;
+    elements.searchBarWrap.classList.toggle("hidden", shouldHide);
+
+    if (shouldHide && elements.searchInput.value) {
+        elements.searchInput.value = "";
+    }
+}
+
 function applySearch() {
     const keyword = elements.searchInput.value.trim().toLowerCase();
     state.filteredReplays = !keyword
@@ -562,11 +576,13 @@ async function loadReplays() {
 
     if (!state.allReplays.length) {
         state.filteredReplays = [];
+        updateSearchVisibility();
         renderList();
         elements.playerStatus.textContent = "Belum ada replay";
         return;
     }
 
+    updateSearchVisibility();
     applySearch();
     syncFromHash();
 }
