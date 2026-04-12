@@ -630,44 +630,7 @@ function bindPlayerEvents() {
 
 function bindUiEvents() {
     elements.searchInput.addEventListener("input", applySearch);
-    elements.playPauseButton.addEventListener("click", togglePlayback);
     elements.overlayPlayButton.addEventListener("click", togglePlayback);
-    elements.muteButton.addEventListener("click", toggleMute);
-    elements.fullscreenButton.addEventListener("click", async () => {
-        if (state.guardLocked) {
-            return;
-        }
-        const container = document.querySelector(".player-shell");
-        const mediaTarget = elements.replayPlayer?.querySelector?.("video") || elements.replayPlayer;
-
-        if (!document.fullscreenElement) {
-            if (container.requestFullscreen) {
-                await container.requestFullscreen();
-                return;
-            }
-
-            if (container.webkitRequestFullscreen) {
-                await container.webkitRequestFullscreen();
-                return;
-            }
-
-            if (mediaTarget?.webkitEnterFullscreen) {
-                mediaTarget.webkitEnterFullscreen();
-                return;
-            }
-
-            return;
-        }
-
-        if (document.exitFullscreen) {
-            await document.exitFullscreen();
-            return;
-        }
-
-        if (document.webkitExitFullscreen) {
-            await document.webkitExitFullscreen();
-        }
-    });
 
     elements.progressBar.addEventListener("input", () => {
         if (state.guardLocked) {

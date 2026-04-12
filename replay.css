@@ -103,10 +103,7 @@ textarea {
 }
 
 .player-controls {
-    display: block;
-    padding: 16px 18px 18px;
-    background: linear-gradient(180deg, rgba(15, 17, 20, 0.92) 0%, rgba(10, 12, 14, 0.98) 100%);
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    display: none;
 }
 
 .control-button {
@@ -262,10 +259,6 @@ textarea {
 }
 
 @media (max-width: 768px) {
-    .player-controls {
-        padding: 14px;
-    }
-
     .replay-layout {
         gap: 16px;
     }
@@ -287,11 +280,6 @@ textarea {
     .overlay-play {
         width: 66px;
         height: 66px;
-    }
-
-    .control-button {
-        width: 42px;
-        height: 42px;
     }
 
     .page-guard-card {
