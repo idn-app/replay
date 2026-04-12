@@ -330,6 +330,20 @@ function parseReplayDate(dateString) {
         .replace(/\s+/g, " ")
         .trim();
 
+    const dashMatch = normalized.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+    if (dashMatch) {
+        const [, dayRaw, monthRaw, yearRaw] = dashMatch;
+        return new Date(
+            Number(yearRaw),
+            Number(monthRaw) - 1,
+            Number(dayRaw),
+            0,
+            0,
+            0,
+            0
+        ).getTime();
+    }
+
     const monthMap = {
         jan: 0,
         januari: 0,
