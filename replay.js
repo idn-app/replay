@@ -522,6 +522,18 @@ function updateReplayMeta(replay) {
     renderList();
 }
 
+function waitForVidstackPlayer() {
+    if (window.vidstackReady) {
+        return window.vidstackReady;
+    }
+
+    return Promise.all([
+        customElements.whenDefined("media-player"),
+        customElements.whenDefined("media-provider"),
+        customElements.whenDefined("media-video-layout"),
+    ]);
+}
+
 async function loadReplayIntoPlayer(replay) {
     if (state.guardLocked) {
         return;
@@ -529,6 +541,7 @@ async function loadReplayIntoPlayer(replay) {
 
     updateReplayMeta(replay);
     elements.playerStatus.textContent = "Memuat replay...";
+    await waitForVidstackPlayer();
 
     elements.replayPlayer.src = normalizeReplayLink(replay.link);
     elements.replayPlayer.title = replay.judul || "Replay";
@@ -550,7 +563,10 @@ function syncFromHash() {
     const hashValue = window.location.hash ? decodeURIComponent(window.location.hash.slice(1)) : "";
     const nextReplay = state.allReplays.find((item) => item.id === hashValue) || state.allReplays[0];
     if (!state.currentReplay || state.currentReplay.id !== nextReplay.id) {
-        loadReplayIntoPlayer(nextReplay);
+        loadReplayIntoPlayer(nextReplay).catch((error) => {
+            console.error("Vidstack gagal dimuat:", error);
+            elements.playerStatus.textContent = "Gagal memuat player";
+        });
         if (!hashValue) {
             window.location.hash = encodeURIComponent(nextReplay.id);
         }
